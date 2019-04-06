@@ -1,6 +1,6 @@
 # Crony
 
-Simple cron replacement that calls URL
+Lightweight cron replacement that calls URL
 
 ## Usage
 
