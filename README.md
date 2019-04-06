@@ -45,7 +45,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class HandleRemindersListener implements EventSubscriberInterface
+class TaskListener implements EventSubscriberInterface
 {
     public function onRequest(GetResponseEvent $event): void
     {
