@@ -4,19 +4,77 @@ Simple cron replacement that calls URL
 
 ## Usage
 
-Create `crony.json` in same folder with crony binary.
+Config
 
-```
+```json
 {
   "tasks": [
     {
       "cron": "@every 1m",
-      "url": "http://google.com"
+      "url": "http://app/task"
     }
   ]
 }
 
 ```  
+
+Docker
+
+ 
+```yaml
+services:
+  app:
+    
+  cron:
+    image: 'formapro/crony:latest'
+    depends_on:
+      - app
+    volumes:
+      - './crony.json:/app/crony.json'
+```
+
+Symfony
+
+```php
+<?php
+namespace App\Listener;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\PostResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+
+class HandleRemindersListener implements EventSubscriberInterface
+{
+    public function onRequest(GetResponseEvent $event): void
+    {
+        if ('/task' != $event->getRequest()->getRequestUri()) {
+            return;
+        }
+
+        $event->stopPropagation();
+        $event->setResponse(new Response('Scheduled'));
+    }
+
+    public function onTerminate(PostResponseEvent $event): void
+    {
+        if ('/task' != $event->getRequest()->getRequestUri()) {
+            return;
+        }
+
+        // do task
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::REQUEST => ['onRequest', 255],
+            KernelEvents::TERMINATE => 'onTerminate',
+        ];
+    }
+}
+```
 
 
 ## License
