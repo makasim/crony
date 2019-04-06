@@ -3,12 +3,12 @@ package main
 import (
 	"bytes"
 	"github.com/formapro/crony/cfg"
+	"github.com/robfig/cron"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync"
-	"github.com/robfig/cron"
 )
 
 func main() {
