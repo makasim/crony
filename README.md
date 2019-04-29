@@ -36,7 +36,8 @@ services:
 Symfony
 
 Route:
-```
+
+```yaml
 #config/routes.yaml
 
 cron_task:
@@ -44,6 +45,7 @@ cron_task:
   controller: 'App\Controller\CronTaskController::foo'
   methods: [POST]
 ```
+
 Controller:
 
 ```php
