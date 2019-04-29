@@ -35,6 +35,17 @@ services:
 
 Symfony
 
+Route:
+```
+#config/routes.yaml
+
+cron_task:
+  path: '/cron/task/foo'
+  controller: 'App\Controller\CronTaskController::foo'
+  methods: [POST]
+```
+Controller:
+
 ```php
 <?php declare(strict_types=1);
 
@@ -48,7 +59,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class CronTaskController implements EventSubscriberInterface
 {
-    public function __invoke(Request $request): Response
+    public function foo(Request $request): Response
     {
         $request->attributes->set('task', 'foo');
 
