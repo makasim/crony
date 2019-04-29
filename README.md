@@ -36,30 +36,28 @@ services:
 Symfony
 
 ```php
-<?php
-namespace App\Listener;
+<?php declare(strict_types=1);
+
+namespace App\Controller;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class TaskListener implements EventSubscriberInterface
+class CronTaskController implements EventSubscriberInterface
 {
-    public function onRequest(GetResponseEvent $event): void
+    public function __invoke(Request $request): Response
     {
-        if ('/task' != $event->getRequest()->getRequestUri()) {
-            return;
-        }
+        $request->attributes->set('task', 'foo');
 
-        $event->stopPropagation();
-        $event->setResponse(new Response('Scheduled'));
+        return new Response();
     }
 
     public function onTerminate(PostResponseEvent $event): void
     {
-        if ('/task' != $event->getRequest()->getRequestUri()) {
+        if ('foo' !== $event->getRequest()->attributes->get('task')) {
             return;
         }
 
@@ -69,7 +67,6 @@ class TaskListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST => ['onRequest', 255],
             KernelEvents::TERMINATE => 'onTerminate',
         ];
     }
