@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
-	"log"
 )
 
 type Config struct {
+	Location string `json:"location"`
 	Tasks []Task `json:"tasks"`
 }
 
@@ -17,21 +17,20 @@ type Task struct {
 	Url string `json:"url"`
 }
 
-func Load() *Config {
+func Load() (cfg Config, err error) {
 	dir, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err)
+		return cfg, err
 	}
 
 	dat, err := ioutil.ReadFile(dir + "/crony.json")
 	if err != nil {
-		log.Fatal(err)
+		return cfg, err
 	}
 
-	cfg := &Config{}
-	if err := json.Unmarshal(dat, cfg); err != nil {
-		log.Fatal(err)
+	if err := json.Unmarshal(dat, &cfg); err != nil {
+		return cfg, err
 	}
 
-	return cfg
+	return cfg, nil
 }

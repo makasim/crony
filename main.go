@@ -2,22 +2,32 @@ package main
 
 import (
 	"bytes"
-	"github.com/formapro/crony/cfg"
+	"github.com/makasim/crony/cfg"
 	"github.com/robfig/cron"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync"
+	"time"
 )
 
 func main() {
 	var wg sync.WaitGroup
-	config := cfg.Load()
-	c := cron.New()
+	config, err := cfg.Load()
+	if err != nil {
+		panic(err)
+	}
+
+	var c *cron.Cron
+	if config.Location != "" {
+		c = cron.New(cron.WithLocation(time.UTC))
+	} else {
+		c = cron.New()
+	}
 
 	for _, task := range config.Tasks {
-		err := c.AddFunc(task.Cron, func() {
+		_, err := c.AddFunc(task.Cron, func() {
 			wg.Add(1)
 			defer wg.Done()
 
@@ -25,16 +35,16 @@ func main() {
 
 			resp, err := http.Post(task.Url, "text/html", buf)
 			if err != nil {
-				log.Printf("Run %s %s %s - %s\n", task.Name, task.Cron, task.Url, err)
+				log.Printf("run %s %s %s - %s\n", task.Name, task.Cron, task.Url, err)
 
 				return
 			}
 
-			log.Printf("Run %s %s %s - response status %d\n", task.Name, task.Cron, task.Url, resp.StatusCode)
+			log.Printf("run %s %s %s - response status %d\n", task.Name, task.Cron, task.Url, resp.StatusCode)
 		})
 
 		if err != nil {
-			log.Printf("Failed to add cron func for %s %s %s\n", task.Name, task.Cron, task.Url)
+			log.Fatalf("failed to add cron func for %s %s %s\n", task.Name, task.Cron, task.Url)
 		}
 	}
 
@@ -51,6 +61,6 @@ func main() {
 
 	c.Start()
 
-	log.Println("Crony is working")
+	log.Println("crony is working")
 	wg.Wait()
 }
