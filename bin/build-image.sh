@@ -9,6 +9,6 @@ then
     exit 1
 fi
 
-docker build --rm --pull --force-rm --tag "formapro/crony:$1" .
+docker build --rm --pull --force-rm --tag "makasim/crony:$1" .
 
-docker push "formapro/crony:$1"
+docker push "makasim/crony:$1"
